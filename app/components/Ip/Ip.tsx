@@ -57,7 +57,7 @@ export function IpSearch({ onSubmit }: { onSubmit: (value: string) => void }) {
 
 type Props = {
   ip: string;
-  location: string; // allow '\n' for postal wrap
+  location: string;
   timezone: string;
   isp: string;
 };

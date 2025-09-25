@@ -8,8 +8,10 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
-  return { message: context.VALUE_FROM_NETLIFY };
+export async function clientLoader({}: Route.ClientLoaderArgs) {
+  const message =
+    import.meta.env.VITE_APP_MESSAGE ?? "Ready to track an IP or domain";
+  return { message };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { IpSearch, IpInfo } from "../components/Ip/Ip";
 import { getSelfIp, lookup, type GeoData } from "../lib/ipClient";
+import { MapView } from "../components/Map/Map";
+
+import "leaflet/dist/leaflet.css";
 
 type View = {
   loading: boolean;
@@ -29,7 +32,6 @@ export function Main({ message }: { message: string }) {
     try {
       const data = await lookup(q);
       setView({ loading: false, data });
-      // TODO: center map later with data.location.lat/lng
     } catch (e: any) {
       setView({ loading: false, error: e?.message ?? "Lookup failed" });
     }
@@ -41,6 +43,11 @@ export function Main({ message }: { message: string }) {
     : "—";
   const timezone = view.data?.location.timezone ?? "—";
   const isp = view.data?.isp ?? "—";
+
+  const coords = view.data?.location;
+  const label = view.data
+    ? `${view.data.location.city}, ${view.data.location.region}`
+    : undefined;
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -75,14 +82,9 @@ export function Main({ message }: { message: string }) {
       </section>
 
       {/* Map section */}
-      <section className="relative">
-        <div
-          id="map"
-          className="h-[520px] w-full bg-gray-200 dark:bg-gray-800 grid place-items-center"
-        >
-          <span className="text-gray-600 dark:text-gray-300">
-            Map goes here
-          </span>
+      <section className="relative z-0">
+        <div className="block">
+          <MapView lat={coords?.lat} lng={coords?.lng} label={label} />
         </div>
       </section>
     </main>
