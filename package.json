@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "react-router build && node netlify/prepare.js",
+    "build": "react-router build",
     "dev": "react-router dev",
     "preview": "react-router preview",
     "start": "netlify serve",
