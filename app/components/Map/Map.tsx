@@ -3,18 +3,19 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix default marker icons for Vite bundling
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
+const pinIcon = L.icon({
+  // If the SVG lives in /public/images:
+  iconUrl: "/images/icon-location.svg",
 
-//Workaround for Leaflet URL resolver issue
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+  // If you imported it from src (alternative):
+  // import iconUrl from "../../images/icon-location.svg";
+  // iconUrl,
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+  // Tweak size/anchors to your liking; these feel close to the design
+  iconSize: [46, 56], // width, height in px
+  iconAnchor: [23, 56], // point of the icon that’s on the marker’s LatLng
+  popupAnchor: [0, -48], // popup offset so it sits above the tip
+  className: "drop-shadow-[0_6px_12px_rgba(0,0,0,0.25)]", // optional soft shadow
 });
 
 type Props = {
@@ -44,7 +45,7 @@ export function MapView({ lat, lng, label, zoom = 13 }: Props) {
   }
 
   return (
-    <div className="h-[520px] w-full">
+    <div className="h-full w-full">
       <MapContainer
         center={center}
         zoom={zoom}
@@ -56,7 +57,7 @@ export function MapView({ lat, lng, label, zoom = 13 }: Props) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <Recenter center={center} zoom={zoom} />
-        <Marker position={center}>
+        <Marker position={center} icon={pinIcon}>
           {label ? <Popup>{label}</Popup> : null}
         </Marker>
       </MapContainer>

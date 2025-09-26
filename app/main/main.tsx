@@ -50,17 +50,17 @@ export function Main({ message }: { message: string }) {
     : undefined;
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Blue Hero */}
+    <main className="h-full min-h-[100svh] flex flex-col bg-gray-50 dark:bg-gray-900 overflow-x-hidden overflow-y-hidden">
+      {/* Hero keeps natural height */}
       <section
-        className="relative bg-gradient-to-b from-indigo-600 to-indigo-500
-                    pt-12 pb-44 md:pb-48 px-4"
+        className="relative z-10 bg-gradient-to-b from-indigo-600 to-indigo-500 pt-12 pb-44 md:pb-48 px-4
+                   bg-[url('/images/pattern-bg-mobile.png')] md:bg-[url('/images/pattern-bg-desktop.png')]
+                   bg-cover bg-center bg-no-repeat"
       >
         <h1 className="text-white text-2xl md:text-3xl font-medium text-center">
           IP Address Tracker
         </h1>
 
-        {/* Search */}
         <div className="relative z-30 mt-6 w-full max-w-[560px] mx-auto">
           <IpSearch onSubmit={handleSearch} />
           {view.error ? (
@@ -70,22 +70,17 @@ export function Main({ message }: { message: string }) {
           ) : null}
         </div>
 
-        {/* Info card overlay */}
-        <div
-          className="absolute inset-x-0 top-full -translate-y-1/2 z-20
-                  flex justify-center pointer-events-none"
-        >
+        {/* Floating info card */}
+        <div className="absolute inset-x-0 top-full -translate-y-1/2 z-30 flex justify-center pointer-events-none">
           <div className="w-full max-w-[1100px] px-4 pointer-events-auto">
             <IpInfo ip={ip} location={location} timezone={timezone} isp={isp} />
           </div>
         </div>
       </section>
 
-      {/* Map section */}
-      <section className="relative z-0">
-        <div className="block">
-          <MapView lat={coords?.lat} lng={coords?.lng} label={label} />
-        </div>
+      {/* Map fills the remaining viewport height */}
+      <section className="relative z-0 flex-1 overflow-hidden">
+        <MapView lat={coords?.lat} lng={coords?.lng} label={label} />
       </section>
     </main>
   );
