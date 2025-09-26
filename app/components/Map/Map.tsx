@@ -4,18 +4,11 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const pinIcon = L.icon({
-  // If the SVG lives in /public/images:
   iconUrl: "/images/icon-location.svg",
-
-  // If you imported it from src (alternative):
-  // import iconUrl from "../../images/icon-location.svg";
-  // iconUrl,
-
-  // Tweak size/anchors to your liking; these feel close to the design
-  iconSize: [46, 56], // width, height in px
-  iconAnchor: [23, 56], // point of the icon that’s on the marker’s LatLng
-  popupAnchor: [0, -48], // popup offset so it sits above the tip
-  className: "drop-shadow-[0_6px_12px_rgba(0,0,0,0.25)]", // optional soft shadow
+  iconSize: [46, 56],
+  iconAnchor: [23, 56],
+  popupAnchor: [0, -48],
+  className: "drop-shadow-[0_6px_12px_rgba(0,0,0,0.25)]",
 });
 
 type Props = {
@@ -65,7 +58,6 @@ export function MapView({ lat, lng, label, zoom = 13 }: Props) {
   );
 }
 
-// Smoothly move map when props change
 function Recenter({
   center,
   zoom,

@@ -1,15 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
-export function IpSearch({ onSubmit }: { onSubmit: (value: string) => void }) {
+export function IpSearch() {
   const [value, setValue] = useState("");
-
+  const navigate = useNavigate();
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit(value.trim());
+        const q = value.trim();
+        navigate(q ? `/?q=${encodeURIComponent(q)}` : "/");
       }}
-      className="flex items-stretch w-full"
+      className="flex items-stretch w-full  "
       aria-label="Search for any IP address or domain"
     >
       <input
@@ -21,6 +23,7 @@ export function IpSearch({ onSubmit }: { onSubmit: (value: string) => void }) {
             outline-none shadow-lg bg-white/95
             focus:ring-2 focus:ring-black/20
             text-black
+            hover:cursor-pointer focus:cursor-text
           "
         name="query"
         autoComplete="off"
@@ -31,6 +34,7 @@ export function IpSearch({ onSubmit }: { onSubmit: (value: string) => void }) {
         className="
             px-5 rounded-r-2xl bg-black text-white
             hover:opacity-90 active:opacity-80 grid place-items-center shadow-lg
+            hover:cursor-pointer focus:cursor-pointer
           "
         aria-label="Track"
         title="Track"
@@ -64,7 +68,7 @@ type Props = {
 
 export function IpInfo({ ip, location, timezone, isp }: Props) {
   return (
-    <div className="rounded-3xl bg-white shadow-xl p-6 md:p-8">
+    <div className="rounded-3xl bg-white shadow-xl p-6 md:p-8 hover:cursor-pointer ">
       <div
         className="
           grid grid-cols-1 md:grid-cols-4

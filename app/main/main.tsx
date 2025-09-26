@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IpSearch, IpInfo } from "../components/Ip/Ip";
-import { getSelfIp, lookup, type GeoData } from "../lib/ipClient";
+import { type GeoData } from "../lib/ipClient";
 import { MapView } from "../components/Map/Map";
 
 import "leaflet/dist/leaflet.css";
@@ -11,31 +11,18 @@ type View = {
   data?: GeoData;
 };
 
-export function Main({ message }: { message: string }) {
-  const [view, setView] = useState<View>({ loading: true });
+export function Main({
+  initial,
+}: {
+  initial?: { data: GeoData; q?: string; message: string };
+}) {
+  const [view, setView] = useState<View>(
+    initial?.data ? { loading: false, data: initial.data } : { loading: true }
+  );
 
   useEffect(() => {
-    (async () => {
-      try {
-        const ip = await getSelfIp();
-        const data = await lookup(ip);
-        setView({ loading: false, data });
-      } catch (e: any) {
-        setView({ loading: false, error: e?.message ?? "Failed to load" });
-      }
-    })();
-  }, []);
-
-  async function handleSearch(q: string) {
-    if (!q) return; // ignore empty submits
-    setView((v) => ({ ...v, loading: true, error: undefined }));
-    try {
-      const data = await lookup(q);
-      setView({ loading: false, data });
-    } catch (e: any) {
-      setView({ loading: false, error: e?.message ?? "Lookup failed" });
-    }
-  }
+    if (initial?.data) setView({ loading: false, data: initial.data });
+  }, [initial?.data]);
 
   const ip = view.data?.ip ?? "—";
   const location = view.data
@@ -51,7 +38,7 @@ export function Main({ message }: { message: string }) {
 
   return (
     <main className="h-full min-h-[100svh] flex flex-col bg-gray-50 dark:bg-gray-900 overflow-x-hidden overflow-y-hidden">
-      {/* Hero keeps natural height */}
+      {/* Hero */}
       <section
         className="relative z-10 bg-gradient-to-b from-indigo-600 to-indigo-500 pt-12 pb-44 md:pb-48 px-4
                    bg-[url('/images/pattern-bg-mobile.png')] md:bg-[url('/images/pattern-bg-desktop.png')]
@@ -62,7 +49,7 @@ export function Main({ message }: { message: string }) {
         </h1>
 
         <div className="relative z-30 mt-6 w-full max-w-[560px] mx-auto">
-          <IpSearch onSubmit={handleSearch} />
+          <IpSearch />
           {view.error ? (
             <p className="mt-2 text-center text-sm text-red-100/90">
               {view.error}
@@ -78,7 +65,7 @@ export function Main({ message }: { message: string }) {
         </div>
       </section>
 
-      {/* Map fills the remaining viewport height */}
+      {/* MapView */}
       <section className="relative z-0 flex-1 overflow-hidden">
         <MapView lat={coords?.lat} lng={coords?.lng} label={label} />
       </section>

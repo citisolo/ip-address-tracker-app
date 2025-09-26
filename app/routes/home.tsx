@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import { Main } from "../main/main";
+import { lookup } from "../lib/ipClient";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,12 +9,16 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export async function clientLoader({}: Route.ClientLoaderArgs) {
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const message =
     import.meta.env.VITE_APP_MESSAGE ?? "Ready to track an IP or domain";
-  return { message };
+
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q") || undefined;
+  const data = await lookup(q);
+  return { data, q, message };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  return <Main message={loaderData.message} />;
+  return <Main initial={loaderData} />;
 }

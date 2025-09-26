@@ -29,7 +29,7 @@ export async function getSelfIp(): Promise<string> {
   return ip;
 }
 
-export async function lookup(query: string): Promise<GeoData> {
+export async function lookup(query?: string): Promise<GeoData> {
   if (!IPIFY_KEY) {
     throw new Error(
       "Missing VITE_IPIFY_KEY. Add it to your env to enable lookups."
@@ -39,15 +39,27 @@ export async function lookup(query: string): Promise<GeoData> {
   const url = new URL("https://geo.ipify.org/api/v2/country,city");
   url.searchParams.set("apiKey", IPIFY_KEY);
 
-  if (isIp(query)) url.searchParams.set("ipAddress", query.trim());
-  else url.searchParams.set("domain", query.trim());
+  const q = query?.trim();
+  if (q) {
+    const isIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(q) || q.includes(":");
+    url.searchParams.set(isIp ? "ipAddress" : "domain", q);
+  }
 
   const res = await fetch(url.toString());
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Lookup failed: ${res.status} ${text}`);
+
+  const raw = await res.text();
+  let j: any;
+  try {
+    j = raw ? JSON.parse(raw) : {};
+  } catch {
+    if (!res.ok) throw new Error(`Lookup failed: ${res.status} ${raw}`);
+    throw new Error("Unexpected response from IPify.");
   }
-  const j = await res.json();
+
+  if (!res.ok || j?.code) {
+    const msg = j?.messages ?? j?.message ?? `HTTP ${res.status}`;
+    throw new Error(typeof msg === "string" ? msg : "Lookup failed");
+  }
 
   return {
     ip: j.ip,
@@ -59,7 +71,6 @@ export async function lookup(query: string): Promise<GeoData> {
       region: j.location.region,
       country: j.location.country,
       postalCode: j.location.postalCode ?? "",
-      // ipify returns "-05:00" → normalize to "UTC -05:00"
       timezone: j.location.timezone?.startsWith("UTC")
         ? j.location.timezone
         : `UTC ${j.location.timezone}`,
