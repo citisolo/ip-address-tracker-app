@@ -13,15 +13,29 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/not-found": {
+    params: {};
+  };
+  "/error": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/";
+    page: "/" | "/not-found" | "/error";
   };
   "routes/home.tsx": {
     id: "routes/home";
     page: "/";
+  };
+  "routes/not-found.tsx": {
+    id: "routes/not-found";
+    page: "/not-found";
+  };
+  "routes/error.tsx": {
+    id: "routes/error";
+    page: "/error";
   };
 };

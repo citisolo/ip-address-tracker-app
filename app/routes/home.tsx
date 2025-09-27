@@ -1,6 +1,7 @@
 import type { Route } from "./+types/home";
 import { Main } from "../main/main";
 import { lookup } from "../lib/ipClient";
+import { redirect } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -15,8 +16,34 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
 
   const url = new URL(request.url);
   const q = url.searchParams.get("q") || undefined;
-  const data = await lookup(q);
-  return { data, q, message };
+
+  try {
+    const data = await lookup(q);
+    return { data, q, message };
+  } catch (e: any) {
+    const reason = e?.message ?? "Lookup failed";
+
+    // Detect bad key or API errors
+    if (
+      /missing/i.test(reason) ||
+      /unauthorized/i.test(reason) ||
+      /429/.test(reason)
+    ) {
+      throw redirect(
+        `/error?${new URLSearchParams({
+          reason,
+          code: e?.code ?? "",
+        })}`
+      );
+    }
+
+    throw redirect(
+      `/not-found?${new URLSearchParams({
+        ...(q ? { q } : {}),
+        reason,
+      }).toString()}`
+    );
+  }
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
