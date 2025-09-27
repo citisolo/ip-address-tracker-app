@@ -1,4 +1,3 @@
-// app/lib/ipClient.ts
 export type GeoData = {
   ip: string;
   isp: string;
@@ -34,6 +33,7 @@ export async function lookup(query?: string): Promise<GeoData> {
   if (useDirectIpify()) {
     // DEV path: call IPify directly with VITE_IPIFY_KEY (browser-visible)
     const key = DIRECT_KEY!;
+    //TODO: parametarize the url
     const url = new URL("https://geo.ipify.org/api/v2/country,city");
     url.searchParams.set("apiKey", key);
 
@@ -52,6 +52,7 @@ export async function lookup(query?: string): Promise<GeoData> {
     return mapIpifyResponse(j);
   } else {
     // PROD (and dev without key): use Netlify function proxy (server-side key)
+    //TODO: parametarize function url
     const url = new URL("/.netlify/functions/lookup", window.location.origin);
     if (q) url.searchParams.set("q", q);
 
