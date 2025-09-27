@@ -12,13 +12,7 @@ export type GeoData = {
   };
 };
 
-const DEV = !!import.meta.env.DEV;
-const DIRECT_KEY = import.meta.env.VITE_IPIFY_KEY as string | undefined;
-
-/** Use direct IPify only in dev AND when a key is present; otherwise use the Netlify function */
-function useDirectIpify(): boolean {
-  return DEV && !!DIRECT_KEY;
-}
+const IPIFY_KEY: string | undefined = import.meta.env.VITE_IPIFY_KEY;
 
 export async function getSelfIp(): Promise<string> {
   const res = await fetch("https://api.ipify.org?format=json");
@@ -28,47 +22,40 @@ export async function getSelfIp(): Promise<string> {
 }
 
 export async function lookup(query?: string): Promise<GeoData> {
-  const q = query?.trim();
-
-  if (useDirectIpify()) {
-    // DEV path: call IPify directly with VITE_IPIFY_KEY (browser-visible)
-    const key = DIRECT_KEY!;
-    //TODO: parametarize the url
-    const url = new URL("https://geo.ipify.org/api/v2/country,city");
-    url.searchParams.set("apiKey", key);
-
-    if (q) {
-      const isIp =
-        /^\d{1,3}(\.\d{1,3}){3}$/.test(q) || // IPv4
-        q.includes(":"); // quick IPv6 presence
-      url.searchParams.set(isIp ? "ipAddress" : "domain", q);
-    }
-
-    const res = await fetch(url.toString());
-    const text = await res.text();
-    if (!res.ok) throw new Error(`Lookup failed: ${res.status} ${text}`);
-
-    const j = JSON.parse(text);
-    return mapIpifyResponse(j);
-  } else {
-    // PROD (and dev without key): use Netlify function proxy (server-side key)
-    //TODO: parametarize function url
-    const url = new URL("/.netlify/functions/lookup", window.location.origin);
-    if (q) url.searchParams.set("q", q);
-
-    const res = await fetch(url.toString(), {
-      headers: { "X-CSRF": "dev-demo" }, // optional; keep/remove as you like
-    });
-    const j = await res.json();
-
-    if (!res.ok || j?.error) {
-      throw new Error(j?.detail || j?.error || `HTTP ${res.status}`);
-    }
-    return mapIpifyResponse(j);
+  if (!IPIFY_KEY) {
+    throw new Error(
+      "Missing VITE_IPIFY_KEY. Add it to your env to enable lookups."
+    );
   }
-}
 
-function mapIpifyResponse(j: any): GeoData {
+  const url = new URL("https://geo.ipify.org/api/v2/country,city");
+  url.searchParams.set("apiKey", IPIFY_KEY);
+
+  const q = query?.trim();
+  if (q) {
+    // treat IPv6 or IPv4 as IP, otherwise domain
+    const isIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(q) || q.includes(":");
+    url.searchParams.set(isIp ? "ipAddress" : "domain", q);
+  }
+  // no q => let IPify default to client IP
+
+  const res = await fetch(url.toString());
+
+  // Try to parse JSON either way so we can surface IPify's {code, messages/message}
+  const raw = await res.text();
+  let j: any;
+  try {
+    j = raw ? JSON.parse(raw) : {};
+  } catch {
+    if (!res.ok) throw new Error(`Lookup failed: ${res.status} ${raw}`);
+    throw new Error("Unexpected response from IPify.");
+  }
+
+  if (!res.ok || j?.code) {
+    const msg = j?.messages ?? j?.message ?? `HTTP ${res.status}`;
+    throw new Error(typeof msg === "string" ? msg : "Lookup failed");
+  }
+
   return {
     ip: j.ip,
     isp: j.isp,
@@ -79,6 +66,7 @@ function mapIpifyResponse(j: any): GeoData {
       region: j.location.region,
       country: j.location.country,
       postalCode: j.location.postalCode ?? "",
+      // ipify returns like "-05:00" → normalize to "UTC -05:00"
       timezone: j.location.timezone?.startsWith("UTC")
         ? j.location.timezone
         : `UTC ${j.location.timezone}`,

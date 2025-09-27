@@ -1,6 +1,6 @@
-# [build]
-# command = "npm run build"
-# publish = "build/client"
+[build]
+command = "npm run build"
+publish = "build/client"
 
 [dev]
 command = "npm run dev"
@@ -32,7 +32,7 @@ for = "/assets/*"
 [headers.values]
 "Cache-Control" = "public, max-age=31560000, immutable"
 
-[build]
-command = "npm run build"
-publish = "build"
-functions = "netlify/functions"
+# [build]
+# command = "npm run build"
+# publish = "build"
+# functions = "netlify/functions"
