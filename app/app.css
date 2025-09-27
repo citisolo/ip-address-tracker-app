@@ -1,15 +1,51 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: "Rubik", ui-sans-serif, system-ui, -apple-system, Segoe UI,
+    Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
+
+:root {
+
+  --gray-950: hsl(0 0% 17%);
+  --gray-400: hsl(0 0% 58%);
+
+
+  /* surfaces & text */
+  --surface: #ffffff;
+  --text: var(--gray-950);
+  --text-muted: var(--gray-400);
+  --ring: #dfd4d4;
+
+  /* hero gradient + bg pattern (optional) */
+  --hero-from: #4f46e5;
+  --hero-to: #6366f1;
+  --hero-bg-mobile: url('/images/pattern-bg-mobile.png');
+  --hero-bg-desktop: url('/images/pattern-bg-desktop.png');
+
+  /* components */
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+
+  --surface-contrast: var(--text);
+  --muted: var(--text-muted);
+}
+
+:root.dark,
+[data-theme="dark"] {
+  --surface: #0b0f1a;
+  --text: #ffffff;
+  --text-muted: hsl(0 0% 75%);
+  --ring: rgba(255, 255, 255, .35);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+}
 
 html,
 body,
 #root {
   height: 100%;
+  background: var(--surface);
+  color: var(--text);
 }
 
 #root {
@@ -18,11 +54,21 @@ body,
   display: flex;
   /* main can flex inside */
   flex-direction: column;
+  --hero-bg-mobile: url('/images/pattern-bg-mobile.png');
+  --hero-bg-desktop: url('/images/pattern-bg-desktop.png');
+  --hero-from: #4f46e5;
+  --hero-to: #6366f1;
 }
 
 html,
 body {
+
   @apply bg-white dark:bg-gray-950;
+
+
+  background: var(--surface);
+  color: var(--surface-contrast);
+
   margin: 0;
   overflow-x: hidden;
 
@@ -44,4 +90,102 @@ video {
   display: block;
   max-width: 100%;
   height: auto;
+}
+
+@utility text-muted {
+  color: var(--text-muted);
+  /* Gray 400 from the style guide */
+}
+
+
+@layer components {
+
+  /* Page shell: full-height flex column */
+  .page {
+    @apply h-full min-h-[100svh] flex flex-col overflow-x-hidden overflow-y-hidden;
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  /* Responsive container that matches the design widths */
+  .shell {
+    width: 100%;
+    max-width: 1440px;
+    /* Desktop design width */
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem);
+    /* comfy gutters from 320px to wide screens */
+  }
+
+  /* Map section should fill remaining viewport height */
+  .map-section {
+    @apply relative z-0 flex-1 overflow-hidden;
+  }
+
+  /* Overlay wrapper for the info card */
+  .overlay-wrap {
+    @apply text-center absolute inset-x-0 top-full -translate-y-40 flex justify-center pointer-events-none z-30;
+
+  }
+
+  .overlay-inner {
+    @apply pointer-events-auto;
+  }
+
+  .hero {
+    @apply relative z-10 pt-12 pb-44 px-4;
+
+    background-image: var(--hero-bg-mobile);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      @apply pb-48;
+      background-image: var(--hero-bg-desktop);
+    }
+
+    .overlay-wrap {
+      @apply -translate-y-1/2;
+    }
+
+  }
+
+  .hero-title {
+    @apply text-2xl md:text-3xl font-medium text-center;
+    color: white;
+  }
+
+  .search-input {
+    @apply flex-1 rounded-l-2xl px-5 py-4 text-[18px] leading-tight shadow-lg outline-none bg-white text-black focus:ring-2 hover:cursor-pointer focus:cursor-text;
+    --tw-ring-color: var(--ring);
+  }
+
+  .search-form {
+    @apply flex items-stretch w-full
+  }
+
+  .search-button {
+    @apply px-5 rounded-r-2xl bg-black text-white hover:opacity-70 active:opacity-80 grid place-items-center shadow-lg hover:cursor-pointer focus:cursor-pointer;
+
+  }
+
+  .ipinfo {
+    @apply grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-0 md:divide-x md:divide-gray-200;
+  }
+
+  .ipinfo-cell {
+    @apply md:px-6;
+  }
+
+  .ipinfo-label {
+    @apply text-[10px] tracking-[0.2em] uppercase font-semibold text-muted mb-2;
+  }
+
+  .ipinfo-value {
+    @apply text-[22px] md:text-[26px] font-medium leading-snug whitespace-pre-line text-black;
+  }
+
 }

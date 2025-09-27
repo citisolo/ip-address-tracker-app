@@ -11,31 +11,21 @@ export function IpSearch() {
         const q = value.trim();
         navigate(q ? `/?q=${encodeURIComponent(q)}` : "/");
       }}
-      className="flex items-stretch w-full  "
+      className="search-form"
       aria-label="Search for any IP address or domain"
     >
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Search for any IP address or domain"
-        className="
-            flex-1 rounded-l-2xl px-5 py-4 text-[15px] leading-none
-            outline-none shadow-lg bg-white/95
-            focus:ring-2 focus:ring-black/20
-            text-black
-            hover:cursor-pointer focus:cursor-text
-          "
+        className="search-input"
         name="query"
         autoComplete="off"
         aria-label="IP or domain"
       />
       <button
         type="submit"
-        className="
-            px-5 rounded-r-2xl bg-black text-white
-            hover:opacity-90 active:opacity-80 grid place-items-center shadow-lg
-            hover:cursor-pointer focus:cursor-pointer
-          "
+        className="search-button"
         aria-label="Track"
         title="Track"
       >
@@ -69,13 +59,7 @@ type Props = {
 export function IpInfo({ ip, location, timezone, isp }: Props) {
   return (
     <div className="rounded-3xl bg-white shadow-xl p-6 md:p-8 hover:cursor-pointer ">
-      <div
-        className="
-          grid grid-cols-1 md:grid-cols-4
-          gap-6 md:gap-0
-          md:divide-x md:divide-gray-200
-        "
-      >
+      <div className="ipinfo">
         <InfoCell label="IP ADDRESS" value={ip} />
         <InfoCell label="LOCATION" value={location} />
         <InfoCell label="TIMEZONE" value={timezone} />
@@ -87,13 +71,9 @@ export function IpInfo({ ip, location, timezone, isp }: Props) {
 
 function InfoCell({ label, value }: { label: string; value: string }) {
   return (
-    <div className="md:px-6">
-      <p className="text-[10px] tracking-[2px] text-gray-500 font-semibold mb-2">
-        {label}
-      </p>
-      <p className="text-[22px] md:text-[26px] font-medium leading-snug whitespace-pre-line text-black">
-        {value}
-      </p>
+    <div className="ipinfo-cell">
+      <p className="ipinfo-label">{label}</p>
+      <p className="ipinfo-value">{value}</p>
     </div>
   );
 }
