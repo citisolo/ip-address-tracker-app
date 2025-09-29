@@ -96,7 +96,19 @@ useEffect(() => {
    npm install
    ```
 
-3. Start the dev server:
+3. Copy the `.env.example` file to `.env.local` and set key
+
+   ```bash
+   # .env.example
+   # Copy to .env.local for local dev
+   # For local SPA 
+   VITE_IPIFY_KEY=your_ipify_api_key_here 
+   # For SSR BUILD
+   IPIFY_KEY=your_ipify_api_key_here 
+   VITE_APP_MESSAGE="Welcome to the IP Tracker app"
+   ```
+
+4. Start the dev server:
 
    ```bash
    npm run dev
