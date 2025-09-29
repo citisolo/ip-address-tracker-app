@@ -1,4 +1,3 @@
-// netlify/functions/lookup.ts
 import type { Handler, HandlerEvent } from "@netlify/functions";
 
 const IPIFY_KEY = process.env.IPIFY_KEY!;
@@ -7,7 +6,6 @@ const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "http://localhost:8888",
   "https://citisolo-ip-address-tracker.netlify.app",
-  "https://yourdomain.com",
 ];
 
 const cors = (origin = "") => {
